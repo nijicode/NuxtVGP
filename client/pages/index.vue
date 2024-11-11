@@ -9,7 +9,7 @@
 			<v-container>
 				<v-row>
 					<!-- Loop through each launch in the launches array -->
-					<v-col v-for="launch in launches" :key="launch.id" cols="12" md="4">
+					<v-col v-for="launch in paginatedLaunches" :key="launch.id" cols="12" md="4">
 						<v-card class="mb-4 h-100" link>
 							<v-card-title>Mission: {{ launch.mission_name }}</v-card-title>
 							<v-card-text>
@@ -38,6 +38,14 @@
 					</v-col>
 				</v-row>
 			</v-container>
+			<v-row class="justify-center mt-4">
+				<v-pagination
+					v-model="page"
+					:length="totalPages"
+					next-icon="mdi-menu-right"
+					prev-icon="mdi-menu-left"
+				/>
+			</v-row>
 		</v-container>
 	</v-container>
 </template>
@@ -60,7 +68,7 @@ const query = gql`
 `
 const { data } = useAsyncQuery<{
 	launches: {
-		mission: String
+		mission_name: String
 		id: number
 		rocket: {
 			rocket_name: String
@@ -74,6 +82,18 @@ const { data } = useAsyncQuery<{
 }>(query)
 const launches = computed(() => data.value?.launches ?? [])
 const expandedLaunches = ref(new Set<number>())
+const page = ref(1)
+const launchesPerPage = 9
+
+// Calculate the total number of pages based on the number of launches
+const totalPages = computed(() => Math.ceil(launches.value.length / launchesPerPage))
+
+// Slice the launches array to only display launches for the current page
+const paginatedLaunches = computed(() => {
+	const start = (page.value - 1) * launchesPerPage
+	const end = start + launchesPerPage
+	return launches.value.slice(start, end)
+})
 
 // Toggle the visibility of details for a specific launch
 function toggleDetails(id: number) {
