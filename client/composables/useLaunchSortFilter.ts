@@ -9,6 +9,9 @@ type Launch = {
 	launch_site?: {
 		site_name?: string
 	}
+	links?: {
+		video_link?: string
+	}
 }
 
 export function useLaunchSortFilter(launches: Ref<Launch[]>): {

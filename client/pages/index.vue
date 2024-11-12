@@ -10,7 +10,6 @@
 				<!-- Filter Inputs -->
 				<v-text-field v-model="rocketFilter" label="Filter by Rocket" class="mr-4" />
 				<v-text-field v-model="yearFilter" label="Filter by Year" class="mr-4" />
-
 				<!-- Sort Controls -->
 				<v-select v-model="sortCriteria" :items="['date', 'mission']" label="Sort by" class="mr-4" />
 				<v-select v-model="sortOrder" :items="['asc', 'desc']" label="Order" />
@@ -19,7 +18,13 @@
 				<v-row>
 					<!-- Loop through each launch in the launches array -->
 					<v-col v-for="launch in paginatedLaunches" :key="launch.id" cols="12" md="4">
-						<v-card class="mb-4 h-100" link>
+						<v-card class="mb-4 h-100">
+							<iframe
+								:src="getYouTubeEmbedUrl(launch.links?.video_link)"
+								frameborder="0"
+								width="100%"
+								height="315"
+							/>
 							<v-card-title>Mission: {{ launch.mission_name }}</v-card-title>
 							<v-card-text>
 								<p>Rocket: {{ launch.rocket.rocket_name }}</p>
@@ -76,6 +81,9 @@ const query = gql`
 			launch_site {
 				site_name
 			}
+			links {
+				video_link
+			}
 		}
 	}
 `
@@ -90,6 +98,9 @@ interface Launch {
 	launch_site: {
 		site_name: string
 	}
+	links: {
+		video_link: string
+	}
 }
 const { data } = useAsyncQuery<{
 	launches: Launch[]
@@ -103,8 +114,6 @@ const launchesPerPage = 9
 const { sortCriteria, sortOrder, rocketFilter, yearFilter, filteredAndSortedLaunches } =
 	useLaunchSortFilter(launches)
 
-// console.log(filteredAndSortedLaunches.value)
-
 // Calculate the total number of pages based on the filtered and sorted launches
 const totalPages = computed(() => Math.ceil(filteredAndSortedLaunches.value.length / launchesPerPage))
 
@@ -114,6 +123,12 @@ const paginatedLaunches = computed(() => {
 	const end = start + launchesPerPage
 	return filteredAndSortedLaunches.value.slice(start, end)
 })
+
+// Method to extract video ID and return the YouTube embed URL
+function getYouTubeEmbedUrl(url: string | undefined): string | undefined {
+	const videoId = url?.split('v=')[1]
+	return `https://www.youtube.com/embed/${videoId}`
+}
 
 // Toggle the visibility of details for a specific launch
 function toggleDetails(id: number) {
