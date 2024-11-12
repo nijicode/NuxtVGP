@@ -6,6 +6,15 @@
 		<v-container class="border mt-5 bg-grey-darken-4 rounded-lg">
 			<h3>Display Launches using Pages</h3>
 			<!-- <pre>{{ launches }}</pre> -->
+			<v-container class="d-flex align-center justify-space-between">
+				<!-- Filter Inputs -->
+				<v-text-field v-model="rocketFilter" label="Filter by Rocket" class="mr-4" />
+				<v-text-field v-model="yearFilter" label="Filter by Year" class="mr-4" />
+
+				<!-- Sort Controls -->
+				<v-select v-model="sortCriteria" :items="['date', 'mission']" label="Sort by" class="mr-4" />
+				<v-select v-model="sortOrder" :items="['asc', 'desc']" label="Order" />
+			</v-container>
 			<v-container>
 				<v-row>
 					<!-- Loop through each launch in the launches array -->
@@ -38,15 +47,19 @@
 					</v-col>
 				</v-row>
 			</v-container>
-			<v-row class="justify-center mt-4">
-				<v-pagination
-					v-model="page"
-					:length="totalPages"
-					next-icon="mdi-menu-right"
-					prev-icon="mdi-menu-left"
-				/>
-			</v-row>
 		</v-container>
+		<div class="text-center">
+			<v-row class="justify-center mt-4">
+				<v-col cols="6">
+					<v-pagination
+						v-model="page"
+						:length="totalPages"
+						next-icon="mdi-menu-right"
+						prev-icon="mdi-menu-left"
+					/>
+				</v-col>
+			</v-row>
+		</div>
 	</v-container>
 </template>
 <script lang="ts" setup>
@@ -66,33 +79,40 @@ const query = gql`
 		}
 	}
 `
+interface Launch {
+	mission_name: string
+	id: number
+	rocket: {
+		rocket_name: string
+	}
+	details: string
+	launch_date_local: string
+	launch_site: {
+		site_name: string
+	}
+}
 const { data } = useAsyncQuery<{
-	launches: {
-		mission_name: String
-		id: number
-		rocket: {
-			rocket_name: String
-		}
-		details: String
-		launch_date_local: String
-		launch_site: {
-			site_name: String
-		}
-	}[]
+	launches: Launch[]
 }>(query)
 const launches = computed(() => data.value?.launches ?? [])
 const expandedLaunches = ref(new Set<number>())
 const page = ref(1)
 const launchesPerPage = 9
 
-// Calculate the total number of pages based on the number of launches
-const totalPages = computed(() => Math.ceil(launches.value.length / launchesPerPage))
+// Use the sorting and filtering composable
+const { sortCriteria, sortOrder, rocketFilter, yearFilter, filteredAndSortedLaunches } =
+	useLaunchSortFilter(launches)
+
+// console.log(filteredAndSortedLaunches.value)
+
+// Calculate the total number of pages based on the filtered and sorted launches
+const totalPages = computed(() => Math.ceil(filteredAndSortedLaunches.value.length / launchesPerPage))
 
 // Slice the launches array to only display launches for the current page
 const paginatedLaunches = computed(() => {
 	const start = (page.value - 1) * launchesPerPage
 	const end = start + launchesPerPage
-	return launches.value.slice(start, end)
+	return filteredAndSortedLaunches.value.slice(start, end)
 })
 
 // Toggle the visibility of details for a specific launch
