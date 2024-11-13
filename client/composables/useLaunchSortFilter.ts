@@ -1,6 +1,6 @@
 type Launch = {
 	details: string
-	id: number
+	id: string
 	mission_name: string
 	launch_date_local: string
 	rocket: {
@@ -21,11 +21,8 @@ export function useLaunchSortFilter(launches: Ref<Launch[]>): {
 	yearFilter: Ref<string>
 	filteredAndSortedLaunches: ComputedRef<Launch[]>
 } {
-	// Sorting criteria (e.g., by date, mission name)
 	const sortCriteria = ref<'date' | 'mission'>('date')
 	const sortOrder = ref<'asc' | 'desc'>('asc')
-
-	// Filter criteria (e.g., by rocket name or launch site)
 	const rocketFilter = ref<string>('')
 	const yearFilter = ref<string>('')
 
