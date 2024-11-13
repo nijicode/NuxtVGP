@@ -1,10 +1,7 @@
 <template>
 	<v-container>
-		<h1>Welcome to Apollo System Exam</h1>
-		<h4>Here I am going todo some Task utilizing the techs below:</h4>
-		<h5>Nuxt 3 / Vuetify / Graphql / Pinia</h5>
+		<h2>SpaceX Launches</h2>
 		<v-container class="border mt-5 bg-grey-darken-4 rounded-lg">
-			<h3>Display Launches using Pages</h3>
 			<!-- <pre>{{ launches }}</pre> -->
 			<v-container class="d-flex align-center justify-space-between">
 				<!-- Filter Inputs -->
@@ -40,6 +37,7 @@
 							:launch-details="launch.details"
 							:rocket-name="launch.rocket.rocket_name"
 							:expanded-launches="expandedLaunches"
+							:add-or-remove-favorites="addOrRemoveFavorites"
 						/>
 					</v-col>
 				</v-row>
@@ -120,5 +118,67 @@ function toggleDetails(id: string) {
 	} else {
 		expandedLaunches.value.add(id)
 	}
+}
+
+const favoritesStore = useFavoritesStore()
+
+function addOrRemoveFavorites(launchId: string) {
+	if (launchId) {
+		const query = gql`
+			query Launch($launchId: ID!) {
+				launch(id: $launchId) {
+					rocket {
+						rocket {
+							id
+							name
+							description
+							first_flight
+							height {
+								feet
+								meters
+							}
+							diameter {
+								feet
+								meters
+							}
+							stages
+						}
+					}
+				}
+			}
+		`
+		interface Rocket {
+			rocket: {
+				id: string
+				name: string
+				description: string
+				first_flight: string
+				height: {
+					feet: number
+					meters: number
+				}
+				diameter: {
+					feet: number
+					meters: number
+				}
+				stages: number
+			}
+		}
+
+		const { data } = useAsyncQuery<{
+			launch: { rocket: Rocket }
+		}>(query, { launchId })
+
+		const launch = computed(() => data.value?.launch?.rocket ?? null)
+
+		if (launch.value) {
+			if (favoritesStore.favoriteRockets.some((fav) => fav.rocket.id === launch.value.rocket.id)) {
+				favoritesStore.removeFavorite(launch.value.rocket.id)
+			} else {
+				favoritesStore.addFavorite(launch.value)
+			}
+		}
+	}
+	console.log([...favoritesStore.favoriteRockets])
 }
 </script>

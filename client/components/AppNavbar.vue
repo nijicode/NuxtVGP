@@ -11,7 +11,7 @@ const drawer = ref(false)
 		<div class="d-none d-md-flex ga-3">
 			<v-btn text to="/">Home</v-btn>
 			<v-btn text to="/launches">Launches</v-btn>
-			<v-btn text to="/">Favorites</v-btn>
+			<v-btn text to="/favorites">Favorites</v-btn>
 		</div>
 	</v-app-bar>
 	<v-navigation-drawer
@@ -22,6 +22,6 @@ const drawer = ref(false)
 	>
 		<v-list-item link to="/" title="Home" />
 		<v-list-item link to="/launches" title="Launches" />
-		<v-list-item link to="/" title="Favorites" />
+		<v-list-item link to="/favorites" title="Favorites" />
 	</v-navigation-drawer>
 </template>
