@@ -4,7 +4,7 @@ import vuetify from 'vite-plugin-vuetify'
 export default defineNuxtConfig({
 	srcDir: 'client/',
 	build: { transpile: ['vuetify'] },
-	imports: { dirs: ['./stores', './composables'] },
+	imports: { dirs: ['./stores', './composables', './components'] },
 	apollo: {
 		autoImports: true,
 		proxyCookies: true,
