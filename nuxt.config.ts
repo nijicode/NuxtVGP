@@ -2,6 +2,11 @@ import vuetify from 'vite-plugin-vuetify'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
+	head: {
+		link: [
+			{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }, // Correct path to favicon
+		],
+	},
 	srcDir: 'client/',
 	build: { transpile: ['vuetify'] },
 	imports: { dirs: ['./stores', './composables', './components'] },
