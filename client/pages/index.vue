@@ -87,7 +87,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="ship in ships" :key="ship.name">
+				<tr v-for="ship in ships" :key="ship.id">
 					<td>{{ ship.name }}</td>
 					<td>
 						<v-chip :color="ship.active ? 'green' : 'red'">{{ ship.active }}</v-chip>
@@ -109,12 +109,13 @@ const query = gql`
 		}
 	}
 `
+interface Ship {
+	id: string
+	name: string
+	active: boolean
+}
 const { data } = useAsyncQuery<{
-	ships: {
-		id: String
-		name: String
-		active: Boolean
-	}[]
+	ships: Ship[]
 }>(query)
 const ships = computed(() => data.value?.ships ?? [])
 </script>
