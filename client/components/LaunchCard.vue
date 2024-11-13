@@ -16,9 +16,14 @@
 
 			<p>Site: {{ launchSite || 'Unknown' }}</p>
 			<v-card-actions>
-				<v-tooltip text="Add to favorites" location="end">
+				<v-tooltip :text="isFavorite ? `Remove to favorites` : `Add to favorites`" location="end">
 					<template #activator="{ props }">
-						<v-btn v-bind="props" icon="mdi-heart" />
+						<v-btn
+							v-bind="props"
+							:icon="isFavorite ? 'mdi-heart' : 'mdi-heart-outline'"
+							:color="isFavorite ? 'red' : 'gray'"
+							@click="addOrRemoveFavorites(launchId)"
+						/>
 					</template>
 				</v-tooltip>
 				<v-spacer />
@@ -43,6 +48,12 @@
 </template>
 
 <script lang="ts" setup>
+const favoritesStore = useFavoritesStore()
+
+const isFavorite = computed(() =>
+	favoritesStore.favoriteRockets.some((fav) => fav.rocket.name === rocketName),
+)
+
 interface Props {
 	videoSrc: string
 	missionName: string
@@ -53,6 +64,7 @@ interface Props {
 	launchId: string
 	launchDate: string
 	launchDetails: string | undefined
+	addOrRemoveFavorites: (launchId: string) => void
 }
 const props = defineProps<Props>()
 

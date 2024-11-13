@@ -58,6 +58,7 @@ const launch = computed(() => data.value?.launch?.rocket ?? null)
 			:diameter-in-meters="launch.rocket.diameter.meters"
 			:diameter-in-feet="launch.rocket.diameter.feet"
 			:stages="launch.rocket.stages"
+			:show-back="true"
 		/>
 	</v-container>
 	<v-container v-else class="text-center">

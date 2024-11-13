@@ -1,5 +1,5 @@
 <template>
-	<v-card class="mx-auto max-width-card" prepend-icon="mdi-rocket-launch" :subtitle="firstFlight">
+	<v-card class="mx-auto max-width-card h-100" prepend-icon="mdi-rocket-launch" :subtitle="firstFlight">
 		<template #title>
 			<span class="font-weight-black">{{ rocketName }}</span>
 		</template>
@@ -29,7 +29,7 @@
 						Number of Stages: {{ stages }}
 					</v-chip>
 					<v-spacer />
-					<NuxtLink to="/launches"><v-btn color="blue">Go back</v-btn></NuxtLink>
+					<NuxtLink v-if="showBack" to="/launches"><v-btn color="blue">Go back</v-btn></NuxtLink>
 				</v-card-actions>
 			</div>
 		</v-card-text>
@@ -45,6 +45,7 @@ interface Props {
 	diameterInFeet: number
 	diameterInMeters: number
 	stages: number
+	showBack: boolean
 }
 const props = defineProps<Props>()
 
@@ -57,6 +58,7 @@ const {
 	diameterInFeet,
 	diameterInMeters,
 	stages,
+	showBack,
 } = props
 </script>
 
