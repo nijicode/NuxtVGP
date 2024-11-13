@@ -1,5 +1,8 @@
 <template>
-	<v-footer class="bg-grey-darken-4 text-center d-flex flex-column">
+	<v-footer
+		class="bg-grey-darken-4 text-center d-flex flex-column justify-space-between py-10"
+		style="max-height: fit-content"
+	>
 		<div>
 			<v-btn v-for="icon in icons" :key="icon" :icon="icon" class="mx-4" variant="text" />
 		</div>

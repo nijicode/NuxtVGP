@@ -26,43 +26,26 @@
 					</v-col>
 				</v-row>
 			</div>
-			<v-container>
+			<v-container v-if="paginatedLaunches.length">
 				<v-row>
 					<!-- Loop through each launch in the launches array -->
 					<v-col v-for="launch in paginatedLaunches" :key="launch.id" cols="12" md="4">
-						<v-card class="mb-4 h-100">
-							<iframe
-								:src="getYouTubeEmbedUrl(launch.links?.video_link)"
-								frameborder="0"
-								width="100%"
-								height="315"
-							/>
-							<v-card-title>Mission: {{ launch.mission_name }}</v-card-title>
-							<v-card-text>
-								<p>Rocket: {{ launch.rocket.rocket_name }}</p>
-								<p>Site: {{ launch.launch_site?.site_name || 'Unknown' }}</p>
-								<v-card-actions>
-									<p>Click arrow for details</p>
-									<v-spacer />
-									<v-btn
-										:icon="
-											expandedLaunches.has(launch.id)
-												? 'mdi-chevron-up'
-												: 'mdi-chevron-down'
-										"
-										@click="toggleDetails(launch.id)"
-									/>
-								</v-card-actions>
-								<v-expand-transition>
-									<div v-show="expandedLaunches.has(launch.id)">
-										<p>{{ launch?.details || 'No Details Provided' }}</p>
-									</div>
-								</v-expand-transition>
-							</v-card-text>
-							<v-card-subtitle>{{ launch.launch_date_local }}</v-card-subtitle>
-						</v-card>
+						<LaunchCard
+							:video-src="getYouTubeEmbedUrl(launch.links?.video_link)"
+							:mission-name="launch.mission_name"
+							:launch-site="launch.launch_site?.site_name"
+							:toggle-details="toggleDetails"
+							:launch-id="launch.id"
+							:launch-date="launch.launch_date_local"
+							:launch-details="launch.details"
+							:rocket-name="launch.rocket.rocket_name"
+							:expanded-launches="expandedLaunches"
+						/>
 					</v-col>
 				</v-row>
+			</v-container>
+			<v-container v-else class="text-center">
+				<h1>No Launch Found.</h1>
 			</v-container>
 		</v-container>
 	</v-container>
@@ -89,7 +72,7 @@ const query = gql`
 `
 interface Launch {
 	mission_name: string
-	id: number
+	id: string
 	rocket: {
 		rocket_name: string
 	}
@@ -106,7 +89,7 @@ const { data } = useAsyncQuery<{
 	launches: Launch[]
 }>(query)
 const launches = computed(() => data.value?.launches ?? [])
-const expandedLaunches = ref(new Set<number>())
+const expandedLaunches = ref(new Set<string>())
 const page = ref(1)
 const launchesPerPage = 9
 
@@ -131,7 +114,7 @@ function getYouTubeEmbedUrl(url: string | undefined): string | undefined {
 }
 
 // Toggle the visibility of details for a specific launch
-function toggleDetails(id: number) {
+function toggleDetails(id: string) {
 	if (expandedLaunches.value.has(id)) {
 		expandedLaunches.value.delete(id)
 	} else {

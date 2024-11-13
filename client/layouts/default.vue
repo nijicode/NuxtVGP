@@ -1,10 +1,10 @@
 <template>
 	<v-app>
-		<Navbar />
+		<AppNavbar />
 		<v-main class="mt-16">
 			<slot />
 		</v-main>
-		<Footer />
+		<AppFooter />
 	</v-app>
 </template>
 <script>
